@@ -299,7 +299,8 @@
       document.querySelector('.loading-text').textContent = '이미지를 불러올 수 없습니다.';
     };
 
-    img.src = imageURL;
+    img.crossOrigin = 'anonymous';
+    img.src = imageURL + (imageURL.includes('?') ? '&' : '?') + 't=' + Date.now();
   }
 
   async function downloadImg() {
