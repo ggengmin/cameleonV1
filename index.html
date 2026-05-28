@@ -692,10 +692,11 @@
       const sRef = fb.ref(fb.storage, `camelion/${Date.now()}.jpg`);
       await fb.uploadBytes(sRef, finalBlob, { contentType: 'image/jpeg' });
       const url = await fb.getDownloadURL(sRef);
-      const qrURL = `https://cameleon-v1.vercel.app/download.html?img=${encodeURIComponent(url)}`;
+      const qrURL = `https://cameleon-v1.vercel.app/download.html?img=${url}`;
 
       statusEl.textContent = 'QR을 스캔해서 저장하세요 ✿';
-      
+      // URL 디버그 표시
+]
       new QRCode(qrEl, {
         text: qrURL,
         width: 200, height: 200,
