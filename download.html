@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nuvy Photo — CamelionV1</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg:    #0e0e0e;
+    --cream: #FDFAF4;
+    --muted: #7A7060;
+    --gold:  #C8A96E;
+  }
+
+  body {
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'IM Fell English', Georgia, serif;
+    overflow-x: hidden;
+    padding-bottom: 60px;
+  }
+
+  /* ── 로딩 ── */
+  #loading-wrap {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    background: var(--bg);
+    gap: 20px;
+    z-index: 100;
+    transition: opacity 0.7s ease;
+  }
+  #loading-wrap.hidden { opacity: 0; pointer-events: none; }
+
+  /* 필름 릴 아이콘 */
+  .film-icon {
+    display: flex; flex-direction: column; align-items: center; gap: 0;
+  }
+  .film-strip {
+    width: 36px;
+    background: var(--cream);
+    border: 1px solid #444;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 4px;
+    height: 0;
+    overflow: hidden;
+    animation: filmroll 2s ease-in-out infinite;
+  }
+  .film-hole {
+    width: 100%; height: 6px;
+    background: var(--bg);
+    border-radius: 1px;
+  }
+  @keyframes filmroll {
+    0%   { height: 0; opacity: 0; }
+    30%  { opacity: 1; }
+    80%  { height: 60px; opacity: 1; }
+    100% { height: 60px; opacity: 0; }
+  }
+
+  .loading-text {
+    color: var(--muted);
+    font-size: 13px;
+    letter-spacing: 0.3em;
+    font-style: italic;
+    animation: blink 1.6s ease-in-out infinite;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* ── 사진 슬롯 (아래서 올라옴) ── */
+  #photo-slot {
+    width: 100%;
+    max-width: 420px;
+    overflow: hidden;
+    height: 0;
+    transition: height 2.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  #photo-slot.open { height: var(--target-h, 800px); }
+
+  #photo-img {
+    width: 100%;
+    display: block;
+  }
+
+  /* ── 텍스트 + 버튼 ── */
+  #content-wrap {
+    width: 100%;
+    max-width: 420px;
+    padding: 0 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  #content-wrap.visible { opacity: 1; transform: translateY(0); }
+
+  .divider {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--muted), transparent);
+    margin-top: 8px;
+  }
+
+  .record-text {
+    text-align: center;
+    line-height: 1;
+  }
+  .record-label {
+    display: block;
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: 0.4em;
+    margin-bottom: 8px;
+    font-style: italic;
+  }
+  .record-main {
+    display: block;
+    color: var(--cream);
+    font-size: 18px;
+    letter-spacing: 0.1em;
+    font-style: italic;
+  }
+  .record-date {
+    display: block;
+    color: var(--gold);
+    font-size: 13px;
+    letter-spacing: 0.25em;
+    margin-top: 6px;
+  }
+
+  /* 다운로드 버튼 */
+  .btn-download {
+    width: 100%;
+    padding: 16px;
+    border: 1.5px solid var(--cream);
+    background: transparent;
+    color: var(--cream);
+    font-family: 'IM Fell English', Georgia, serif;
+    font-size: 12px;
+    font-style: italic;
+    letter-spacing: 0.3em;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-download:hover   { background: var(--cream); color: var(--bg); }
+  .btn-download:active  { background: #e8e4d8; }
+  .btn-download:disabled{ opacity: 0.35; cursor: default; }
+
+  /* 하단 브랜딩 */
+  .footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding-top: 4px;
+  }
+  .footer-brand {
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: 0.35em;
+    font-style: italic;
+  }
+  .footer-insta {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--muted);
+    font-size: 9px;
+    font-style: italic;
+    letter-spacing: 0.15em;
+    text-decoration: none;
+    border-bottom: 1px solid #333;
+    padding-bottom: 2px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .footer-insta:hover { color: var(--gold); border-color: var(--gold); }
+
+  .insta-icon { width: 12px; height: 12px; opacity: 0.6; }
+</style>
+</head>
+<body>
+
+<!-- 로딩 -->
+<div id="loading-wrap">
+  <div class="film-icon">
+    <div class="film-strip">
+      <div class="film-hole"></div>
+      <div class="film-hole"></div>
+      <div class="film-hole"></div>
+    </div>
+  </div>
+  <p class="loading-text">현상 중입니다... 🎞️</p>
+</div>
+
+<!-- 사진 -->
+<div id="photo-slot">
+  <img id="photo-img" src="" alt="우리의 기록">
+</div>
+
+<!-- 텍스트 + 버튼 -->
+<div id="content-wrap">
+  <div class="divider"></div>
+
+  <div class="record-text">
+    <span class="record-label">our memory</span>
+    <span class="record-main">오늘 우리의 기록</span>
+    <span class="record-date" id="today-date">—</span>
+  </div>
+
+  <button class="btn-download" id="dl-btn" disabled onclick="downloadImg()">
+    ↓ 사진 저장하기
+  </button>
+
+  <div class="footer">
+    <p class="footer-brand">nuvy photo × camelionV1</p>
+    <a class="footer-insta"
+       href="https://www.instagram.com/ggengmin.e/"
+       target="_blank">
+      <svg class="insta-icon" viewBox="0 0 24 24" fill="none">
+        <rect x="2" y="2" width="20" height="20" rx="5"
+              stroke="currentColor" stroke-width="2"/>
+        <circle cx="12" cy="12" r="4"
+                stroke="currentColor" stroke-width="2"/>
+        <circle cx="17.5" cy="6.5" r="1" fill="currentColor"/>
+      </svg>
+      made by. @ggengmin.e
+    </a>
+  </div>
+</div>
+
+<script>
+  // 오늘 날짜 자동
+  (function() {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
+    document.getElementById('today-date').textContent = `${y}.${m}.${d}`;
+  })();
+
+  let imageURL = null;
+
+  function getParam(key) {
+    return new URLSearchParams(window.location.search).get(key);
+  }
+
+  function loadImage() {
+    const imgParam = getParam('img');
+    if (!imgParam) {
+      document.getElementById('loading-text') &&
+        (document.querySelector('.loading-text').textContent = '이미지 정보가 없습니다.');
+      return;
+    }
+
+    imageURL = decodeURIComponent(imgParam);
+    const img  = document.getElementById('photo-img');
+    const slot = document.getElementById('photo-slot');
+
+    img.onload = () => {
+      const ratio = img.naturalHeight / img.naturalWidth;
+      const targetH = Math.round(window.innerWidth * Math.min(ratio, 2.5));
+
+      // 로딩 숨기기
+      setTimeout(() => {
+        document.getElementById('loading-wrap').classList.add('hidden');
+      }, 700);
+
+      // 사진 슬롯 열기
+      setTimeout(() => {
+        slot.style.setProperty('--target-h', targetH + 'px');
+        slot.style.height = '0';
+        void slot.offsetWidth;
+        slot.style.height = targetH + 'px';
+      }, 900);
+
+      // 버튼 등장
+      setTimeout(() => {
+        document.getElementById('content-wrap').classList.add('visible');
+        document.getElementById('dl-btn').disabled = false;
+      }, 3300);
+    };
+
+    img.onerror = () => {
+      document.querySelector('.loading-text').textContent = '이미지를 불러올 수 없습니다.';
+    };
+
+    img.src = imageURL;
+  }
+
+  async function downloadImg() {
+    if (!imageURL) return;
+    try {
+      const res    = await fetch(imageURL);
+      const blob   = await res.blob();
+      const blobUrl= URL.createObjectURL(blob);
+      const a      = document.createElement('a');
+      a.href       = blobUrl;
+      a.download   = `nuvy-camelion-${Date.now()}.jpg`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(blobUrl);
+    } catch(e) {
+      window.open(imageURL, '_blank');
+    }
+  }
+
+  window.downloadImg = downloadImg;
+  window.addEventListener('load', loadImage);
+</script>
+</body>
+</html>
