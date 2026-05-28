@@ -695,11 +695,7 @@
       const qrURL = `https://cameleon-v1.vercel.app/download.html?img=${encodeURIComponent(url)}`;
 
       statusEl.textContent = 'QR을 스캔해서 저장하세요 ✿';
-      // URL 디버그 표시
-      const debugDiv = document.createElement('div');
-      debugDiv.style.cssText = 'color:#0f0;font-size:9px;word-break:break-all;max-width:260px;margin-top:8px;font-family:monospace';
-      debugDiv.textContent = url.substring(0, 120) + '...';
-      document.getElementById('result-info').appendChild(debugDiv);
+      
       new QRCode(qrEl, {
         text: qrURL,
         width: 200, height: 200,

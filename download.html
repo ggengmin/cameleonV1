@@ -162,79 +162,70 @@
 
 <script>
   // 날짜 자동
-  (function() {
-    const now = new Date();
-    const y = now.getFullYear();
-    const m = String(now.getMonth()+1).padStart(2,'0');
-    const d = String(now.getDate()).padStart(2,'0');
-    document.getElementById('today-date').textContent = `${y}.${m}.${d}`;
-  })();
+(function() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth()+1).padStart(2,'0');
+  const d = String(now.getDate()).padStart(2,'0');
+  document.getElementById('today-date').textContent = `${y}.${m}.${d}`;
+})();
 
-  let imageURL = null;
+let imageURL = null;
 
-  function getParam(key) {
-    return new URLSearchParams(window.location.search).get(key);
+function getParam(key) {
+  return new URLSearchParams(window.location.search).get(key);
+}
+
+window.addEventListener('load', function() {
+  const imgParam = getParam('img');
+  if (!imgParam) {
+    document.getElementById('loading-text').textContent = '이미지 정보가 없습니다.';
+    return;
   }
 
-  async function loadImage() {
-    const imgParam = getParam('img');
-    if (!imgParam) {
-      document.getElementById('loading-text').textContent = '이미지 정보가 없습니다.';
-      return;
-    }
+  imageURL = decodeURIComponent(imgParam);
+  const img  = document.getElementById('photo-img');
+  const slot = document.getElementById('photo-slot');
 
-    imageURL = decodeURIComponent(imgParam);
-    const img  = document.getElementById('photo-img');
-    const slot = document.getElementById('photo-slot');
+  img.onload = function() {
+    const imgHeight = img.naturalHeight * (420 / img.naturalWidth);
+    setTimeout(() => document.getElementById('loading-wrap').classList.add('hidden'), 600);
+    setTimeout(() => {
+      slot.style.height = '0';
+      void slot.offsetWidth;
+      slot.style.transition = 'height 2.4s cubic-bezier(0.4,0,0.2,1)';
+      slot.style.height = imgHeight + 'px';
+    }, 800);
+    setTimeout(() => {
+      document.getElementById('actions').classList.add('visible');
+      document.getElementById('dl-btn').disabled = false;
+    }, 3400);
+  };
 
-    // 달래김밥과 완전히 동일한 방식
-    img.onload = () => {
-      const imgHeight = img.naturalHeight * (420 / img.naturalWidth);
+  img.onerror = function() {
+    document.getElementById('loading-text').textContent = '❌ 오류: ' + imageURL.substring(0, 50);
+  };
 
-      // 로딩 숨기기
-      setTimeout(() => {
-        document.getElementById('loading-wrap').classList.add('hidden');
-      }, 600);
+  img.src = imageURL;
+});
 
-      // 슬롯 높이 직접 설정 (달래김밥 방식 그대로)
-      setTimeout(() => {
-        slot.style.height = '0';
-        void slot.offsetWidth;
-        slot.style.transition = 'height 2.4s cubic-bezier(0.4, 0, 0.2, 1)';
-        slot.style.height = imgHeight + 'px';
-      }, 800);
-
-      // 버튼 등장
-      setTimeout(() => {
-        document.getElementById('actions').classList.add('visible');
-        document.getElementById('dl-btn').disabled = false;
-      }, 3400);
-    };
-
-    img.onerror = () => {
-      document.getElementById('loading-text').textContent = '이미지를 불러올 수 없습니다.';
-    };
-
-    img.src = imageURL;
+async function downloadImg() {
+  if (!imageURL) return;
+  try {
+    const response = await fetch(imageURL);
+    const blob = await response.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = `nuvy-camelion-${Date.now()}.jpg`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(blobUrl);
+  } catch(e) {
+    window.open(imageURL, '_blank');
   }
-
-  async function downloadImg() {
-    if (!imageURL) return;
-    try {
-      const response = await fetch(imageURL);
-      const blob = await response.blob();
-      const blobUrl = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = blobUrl;
-      a.download = `nuvy-camelion-${Date.now()}.jpg`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(blobUrl);
-    } catch(e) {
-      window.open(imageURL, '_blank');
-    }
-  }
+}
 
   window.addEventListener('load', loadImage);
 </script>
