@@ -77,8 +77,8 @@
     cursor: pointer;
     transition: all 0.15s;
   }
-  .select-btn:hover     { background: #222; color: #fff; }
-  .select-btn:disabled  { opacity: 0.25; cursor: default; }
+  .select-btn:hover    { background: #222; color: #fff; }
+  .select-btn:disabled { opacity: 0.25; cursor: default; }
 
   /* ═══ 메인 촬영 화면 (가로) ═══ */
   #main-screen {
@@ -94,10 +94,6 @@
     flex: 1;
     position: relative;
     background: #000;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
     overflow: hidden;
   }
 
@@ -115,6 +111,7 @@
     z-index: 10;
   }
   #countdown-overlay.show { display: flex; }
+
   #countdown-number {
     font-size: 120px;
     color: #fff;
@@ -125,6 +122,22 @@
     0%  { transform: scale(1.5); opacity: 0; }
     60% { transform: scale(1.0); opacity: 1; }
     100%{ transform: scale(0.9); opacity: 0.8; }
+  }
+
+  /* 대기 중 표시 */
+  #waiting-overlay {
+    position: absolute; inset: 0;
+    display: none;
+    align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.3);
+    z-index: 9;
+  }
+  #waiting-overlay.show { display: flex; }
+  .waiting-text {
+    color: rgba(255,255,255,0.8);
+    font-size: 16px;
+    letter-spacing: 0.3em;
+    font-style: italic;
   }
 
   #camera-bottom {
@@ -138,7 +151,7 @@
   }
 
   .shot-label {
-    color: rgba(255,255,255,0.8);
+    color: rgba(255,255,255,0.85);
     font-size: 11px;
     letter-spacing: 0.3em;
     font-style: italic;
@@ -166,7 +179,7 @@
   /* 오른쪽 — 프리뷰 */
   #preview-side {
     width: 44%;
-    background: #f5f5f5;
+    background: #f0f0f0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -174,7 +187,6 @@
     position: relative;
   }
 
-  /* 배경지 컨테이너 9:16 */
   #bg-preview-wrap {
     position: relative;
     height: 100%;
@@ -189,7 +201,7 @@
     object-fit: cover;
   }
 
-  /* 필름 프레임 전체 — 배경 위 중앙 */
+  /* 필름 프레임 */
   #film-frame {
     position: absolute;
     width: 42%;
@@ -200,120 +212,139 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.45);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.5);
   }
 
-  /* 퍼포레이션 제거됨 */
-
-  /* 사진 슬롯들 */
   .film-photos {
     display: flex;
     flex-direction: column;
     gap: 3px;
-    padding: 3px 6px;
+    padding: 6px 6px 3px;
     background: #1a1a1a;
   }
 
   .photo-slot {
     width: 100%;
-    aspect-ratio: 3.5 / 3;  /* 3.5:3 가로 비율 */
+    aspect-ratio: 3.5 / 3;
     background: #2a2a2a;
     overflow: hidden;
     position: relative;
     flex-shrink: 0;
   }
-
   .photo-slot img {
     width: 100%; height: 100%;
     object-fit: cover;
     display: block;
   }
-
   .slot-label {
     position: absolute; inset: 0;
     display: flex; align-items: center; justify-content: center;
-    color: rgba(255,255,255,0.3);
+    color: rgba(255,255,255,0.25);
     font-size: 9px;
     letter-spacing: 0.2em;
     font-style: italic;
   }
 
-  /* 하단 NUVY PHOTO 텍스트 */
   .film-footer {
     background: #1a1a1a;
-    padding: 5px 0 6px;
+    padding: 5px 0 7px;
     text-align: center;
     flex-shrink: 0;
   }
   .film-footer span {
-    color: rgba(255,255,255,0.65);
+    color: rgba(255,255,255,0.6);
     font-size: 7px;
     letter-spacing: 0.35em;
     font-family: 'Helvetica Neue', Arial, sans-serif;
     font-weight: 300;
   }
 
-  /* 완료 오버레이 */
-  #done-overlay {
-    position: absolute; inset: 0;
+  /* ═══ 결과 화면 (전체화면 모달) ═══ */
+  #result-screen {
     display: none;
+    position: fixed; inset: 0;
+    background: #111;
+    z-index: 300;
+    flex-direction: row;
+    align-items: stretch;
+  }
+  #result-screen.show { display: flex; }
+
+  /* 결과 — 왼쪽: 합성 이미지 */
+  #result-img-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: #111;
+  }
+
+  #result-img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+    display: block;
+  }
+
+  /* 결과 — 오른쪽: QR + 버튼 */
+  #result-info {
+    width: 300px;
+    display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-end;
-    padding-bottom: 20px;
-    gap: 10px;
-    background: rgba(0,0,0,0.18);
+    justify-content: center;
+    gap: 24px;
+    padding: 32px 24px;
+    background: #1a1a1a;
+    border-left: 1px solid #2a2a2a;
   }
-  #done-overlay.show { display: flex; }
 
-  .done-btn {
-    width: 75%;
-    padding: 12px;
-    border: 1.5px solid;
-    background: transparent;
-    font-family: Georgia, serif;
+  .result-title {
+    color: rgba(255,255,255,0.8);
+    font-size: 12px;
+    letter-spacing: 0.4em;
+    font-style: italic;
+    text-align: center;
+  }
+
+  #result-status {
+    color: rgba(255,255,255,0.45);
     font-size: 10px;
     font-style: italic;
     letter-spacing: 0.2em;
-    cursor: pointer;
-    transition: all 0.15s;
-    border-radius: 2px;
   }
-  .done-btn.primary   { border-color: #fff; color: #fff; }
-  .done-btn.primary:hover  { background: #fff; color: #111; }
-  .done-btn.secondary { border-color: rgba(255,255,255,0.5); color: rgba(255,255,255,0.6); font-size: 9px; }
-  .done-btn.secondary:hover { border-color: #fff; color: #fff; }
 
-  /* QR 화면 */
-  #qr-screen {
-    display: none;
-    position: fixed; inset: 0;
-    flex-direction: column;
-    align-items: center; justify-content: center;
-    gap: 24px;
+  #result-qr {
+    padding: 14px;
     background: #fff;
-    z-index: 200;
   }
-  #qr-screen.show { display: flex; }
 
-  .qr-title   { color: #333; font-size: 13px; letter-spacing: 0.3em; font-style: italic; }
-  #qr-status  { color: #888; font-size: 11px; font-style: italic; }
-  #qr-container { padding: 18px; background: #fff; border: 1px solid #ddd; }
-  .qr-hint    { color: #888; font-size: 11px; letter-spacing: 0.1em; text-align: center; line-height: 1.9; font-style: italic; }
-
-  .qr-retake {
-    padding: 12px 40px;
-    border: 1.5px solid #999;
-    background: transparent;
-    color: #666;
-    font-family: Georgia, serif;
+  .result-hint {
+    color: rgba(255,255,255,0.4);
     font-size: 10px;
+    letter-spacing: 0.1em;
+    text-align: center;
+    line-height: 2;
+    font-style: italic;
+  }
+
+  .result-btn {
+    width: 100%;
+    padding: 13px;
+    border: 1.5px solid;
+    background: transparent;
+    font-family: Georgia, serif;
+    font-size: 11px;
     font-style: italic;
     letter-spacing: 0.25em;
     cursor: pointer;
     transition: all 0.15s;
   }
-  .qr-retake:hover { border-color: #222; color: #222; }
+  .result-btn.primary   { border-color: #fff; color: #fff; }
+  .result-btn.primary:hover  { background: #fff; color: #111; }
+  .result-btn.secondary { border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.4); font-size: 10px; }
+  .result-btn.secondary:hover { border-color: rgba(255,255,255,0.7); color: rgba(255,255,255,0.8); }
 
   .flash-overlay {
     position: fixed; inset: 0;
@@ -335,19 +366,19 @@
 <div id="bg-select-screen">
   <p class="select-title">— 배경을 선택해주세요 —</p>
   <div class="bg-grid">
-    <div class="bg-thumb-wrap" onclick="selectBg(this, 'bg1.jpg')">
+    <div class="bg-thumb-wrap" onclick="selectBg(this,'bg1.jpg')">
       <img class="bg-thumb" src="bg1.jpg" alt="bg1">
     </div>
-    <div class="bg-thumb-wrap" onclick="selectBg(this, 'bg2.jpg')">
+    <div class="bg-thumb-wrap" onclick="selectBg(this,'bg2.jpg')">
       <img class="bg-thumb" src="bg2.jpg" alt="bg2">
     </div>
-    <div class="bg-thumb-wrap" onclick="selectBg(this, 'bg3.jpg')">
+    <div class="bg-thumb-wrap" onclick="selectBg(this,'bg3.jpg')">
       <img class="bg-thumb" src="bg3.jpg" alt="bg3">
     </div>
-    <div class="bg-thumb-wrap" onclick="selectBg(this, 'bg4.jpg')">
+    <div class="bg-thumb-wrap" onclick="selectBg(this,'bg4.jpg')">
       <img class="bg-thumb" src="bg4.jpg" alt="bg4">
     </div>
-    <div class="bg-thumb-wrap" onclick="selectBg(this, 'bg5.jpg')">
+    <div class="bg-thumb-wrap" onclick="selectBg(this,'bg5.jpg')">
       <img class="bg-thumb" src="bg5.jpg" alt="bg5">
     </div>
   </div>
@@ -362,9 +393,16 @@
   <!-- 왼쪽: 카메라 -->
   <div id="camera-side">
     <video id="live-video" autoplay playsinline muted></video>
+
     <div id="countdown-overlay">
       <span id="countdown-number">3</span>
     </div>
+
+    <!-- 2컷 사이 대기 중 표시 -->
+    <div id="waiting-overlay">
+      <p class="waiting-text">잠깐만요...</p>
+    </div>
+
     <div id="camera-bottom">
       <p class="shot-label" id="shot-label">1 / 2 — 눌러서 촬영</p>
       <button class="shutter-btn" id="shutter-btn" onclick="startShot()"></button>
@@ -375,10 +413,7 @@
   <div id="preview-side">
     <div id="bg-preview-wrap">
       <img id="bg-image" src="" alt="background">
-
-      <!-- 필름 프레임 -->
       <div id="film-frame">
-        <!-- 사진 2컷 -->
         <div class="film-photos">
           <div class="photo-slot" id="slot1">
             <span class="slot-label">1st</span>
@@ -387,30 +422,29 @@
             <span class="slot-label">2nd</span>
           </div>
         </div>
-
-        <!-- NUVY PHOTO -->
         <div class="film-footer">
           <span>NUVY PHOTO</span>
         </div>
       </div>
-
-      <!-- 완료 오버레이 -->
-      <div id="done-overlay">
-        <button class="done-btn primary" onclick="goQR()">QR 생성 →</button>
-        <button class="done-btn secondary" onclick="retake()">↩ 다시 찍기</button>
-      </div>
     </div>
   </div>
-
 </div>
 
-<!-- ═══ QR 화면 ═══ -->
-<div id="qr-screen">
-  <p class="qr-title">— 우리의 기록 —</p>
-  <p id="qr-status">업로드 중...</p>
-  <div id="qr-container"></div>
-  <p class="qr-hint">QR을 스캔하면<br>사진을 저장할 수 있어요 ✿</p>
-  <button class="qr-retake" onclick="retake()">↩ 다시 찍기</button>
+<!-- ═══ 결과 화면 ═══ -->
+<div id="result-screen">
+  <!-- 왼쪽: 합성 이미지 미리보기 -->
+  <div id="result-img-wrap">
+    <img id="result-img" src="" alt="result">
+  </div>
+
+  <!-- 오른쪽: QR + 버튼 -->
+  <div id="result-info">
+    <p class="result-title">— 우리의 기록 —</p>
+    <p id="result-status">현상 중입니다... 🎞️</p>
+    <div id="result-qr"></div>
+    <p class="result-hint">QR을 스캔하면<br>사진을 저장할 수 있어요 ✿</p>
+    <button class="result-btn secondary" onclick="retake()">↩ 다시 찍기</button>
+  </div>
 </div>
 
 <!-- Firebase -->
@@ -444,28 +478,26 @@
   const shotLabel  = document.getElementById('shot-label');
   const cdOverlay  = document.getElementById('countdown-overlay');
   const cdNumber   = document.getElementById('countdown-number');
+  const waitingEl  = document.getElementById('waiting-overlay');
 
-  let stream        = null;
-  let selectedBg    = null;
-  let shot1DataURL  = null;
-  let shot2DataURL  = null;
-  let shotCount     = 0;
-  let finalBlob     = null;
+  let stream       = null;
+  let selectedBg   = null;
+  let shot1DataURL = null;
+  let shot2DataURL = null;
+  let shotCount    = 0;
+  let finalBlob    = null;
 
-  // 출력 사이즈 9:16
   const OUT_W = 1080;
   const OUT_H = 1920;
 
-  // 필름 프레임 합성 파라미터
-  const FILM_W  = Math.round(OUT_W * 0.42);
-  const FILM_X  = (OUT_W - FILM_W) / 2;
-  const PHOTO_W = FILM_W - 16;
-  const PHOTO_H = Math.round(PHOTO_W * (3 / 3.5)); // 3.5:3 비율
-  const PHOTO_X = FILM_X + 8;
-  const GAP     = Math.round(OUT_W * 0.005);
-  const FOOTER_H= Math.round(OUT_W * 0.038);
-  const FILM_H  = 8 + PHOTO_H + GAP + PHOTO_H + 8 + FOOTER_H;
-  const FILM_Y      = (OUT_H - FILM_H) / 2;
+  const FILM_W   = Math.round(OUT_W * 0.42);
+  const FILM_X   = (OUT_W - FILM_W) / 2;
+  const PHOTO_W  = FILM_W - 16;
+  const PHOTO_H  = Math.round(PHOTO_W * (3 / 3.5));
+  const PHOTO_X  = FILM_X + 8;
+  const GAP      = Math.round(OUT_W * 0.005);
+  const FOOTER_H = Math.round(OUT_W * 0.038);
+  const FILM_H   = 8 + PHOTO_H + GAP + PHOTO_H + 8 + FOOTER_H;
 
   // 카메라
   async function startCamera() {
@@ -496,7 +528,7 @@
     startCamera();
   }
 
-  // 촬영 시작
+  // 1컷 버튼
   function startShot() {
     if (!stream) return;
     shutterBtn.disabled = true;
@@ -508,6 +540,9 @@
     let count = 3;
     cdOverlay.classList.add('show');
     cdNumber.textContent = count;
+    cdNumber.style.animation = 'none';
+    void cdNumber.offsetWidth;
+    cdNumber.style.animation = 'cpulse 1s ease-in-out';
     const iv = setInterval(() => {
       count--;
       if (count > 0) {
@@ -523,56 +558,54 @@
     }, 1000);
   }
 
-  // 촬영 — 3.5:4 비율 크롭
+  // 촬영
   function captureShot() {
     flashEl.classList.add('flash');
     setTimeout(() => flashEl.classList.remove('flash'), 150);
 
     const vw = video.videoWidth;
     const vh = video.videoHeight;
-
-    // 3.5:3 비율 크롭 (가로로 더 길게)
     const targetRatio = 3.5 / 3;
     const currentRatio = vw / vh;
     let sx, sy, sw, sh;
     if (currentRatio > targetRatio) {
-      sh = vh;
-      sw = Math.round(vh * targetRatio);
-      sx = Math.round((vw - sw) / 2);
-      sy = 0;
+      sh = vh; sw = Math.round(vh * targetRatio);
+      sx = Math.round((vw - sw) / 2); sy = 0;
     } else {
-      sw = vw;
-      sh = Math.round(vw / targetRatio);
-      sx = 0;
-      sy = Math.round((vh - sh) / 2);
+      sw = vw; sh = Math.round(vw / targetRatio);
+      sx = 0; sy = Math.round((vh - sh) / 2);
     }
 
-    const outW = PHOTO_W;
-    const outH = PHOTO_H;
-    capCanvas.width  = outW;
-    capCanvas.height = outH;
+    capCanvas.width  = PHOTO_W;
+    capCanvas.height = PHOTO_H;
     const ctx = capCanvas.getContext('2d');
-    ctx.translate(outW, 0);
+    ctx.translate(PHOTO_W, 0);
     ctx.scale(-1, 1);
-    ctx.drawImage(video, sx, sy, sw, sh, 0, 0, outW, outH);
+    ctx.drawImage(video, sx, sy, sw, sh, 0, 0, PHOTO_W, PHOTO_H);
 
     const dataURL = capCanvas.toDataURL('image/jpeg', 0.95);
     shotCount++;
 
     if (shotCount === 1) {
       shot1DataURL = dataURL;
-      const slot1 = document.getElementById('slot1');
-      slot1.innerHTML = `<img src="${dataURL}">`;
-      shotLabel.textContent = '2 / 2 — 한 번 더!';
-      shutterBtn.disabled = false;
+      document.getElementById('slot1').innerHTML = `<img src="${dataURL}">`;
+      shotLabel.textContent = '잠깐만요...';
+
+      // 2초 대기 후 자동 2컷
+      waitingEl.classList.add('show');
+      setTimeout(() => {
+        waitingEl.classList.remove('show');
+        shotLabel.textContent = '2 / 2 — 자동 촬영!';
+        runCountdown(() => captureShot());
+      }, 2000);
+
     } else {
       shot2DataURL = dataURL;
-      const slot2 = document.getElementById('slot2');
-      slot2.innerHTML = `<img src="${dataURL}">`;
+      document.getElementById('slot2').innerHTML = `<img src="${dataURL}">`;
       shotLabel.textContent = '완성! ✿';
-      setTimeout(() => {
-        document.getElementById('done-overlay').classList.add('show');
-      }, 400);
+
+      // 잠깐 보여주고 결과 화면으로
+      setTimeout(() => goResult(), 600);
     }
   }
 
@@ -580,52 +613,41 @@
   async function composeFinal() {
     return new Promise((resolve, reject) => {
       const fc = document.createElement('canvas');
-      fc.width  = OUT_W;
-      fc.height = OUT_H;
+      fc.width = OUT_W; fc.height = OUT_H;
       const ctx = fc.getContext('2d');
 
       const bgImg = new Image();
       bgImg.crossOrigin = 'anonymous';
       bgImg.onload = () => {
-        // 배경
         ctx.drawImage(bgImg, 0, 0, OUT_W, OUT_H);
 
         const p1 = new Image();
         p1.onload = () => {
           const p2 = new Image();
           p2.onload = () => {
-
-            // ── 필름 프레임 그리기 ──
-            const filmX = FILM_X;
             const filmY = (OUT_H - FILM_H) / 2;
 
-            // 필름 배경 (검정)
+            // 필름 검정 배경
             ctx.fillStyle = '#1a1a1a';
-            roundRect(ctx, filmX, filmY, FILM_W, FILM_H, 6);
+            roundRect(ctx, FILM_X, filmY, FILM_W, FILM_H, 6);
             ctx.fill();
 
-            // 사진1
+            // 사진 1, 2
             const p1y = filmY + 8;
             ctx.drawImage(p1, PHOTO_X, p1y, PHOTO_W, PHOTO_H);
-
-            // 사진2
             const p2y = p1y + PHOTO_H + GAP;
             ctx.drawImage(p2, PHOTO_X, p2y, PHOTO_W, PHOTO_H);
 
-            // NUVY PHOTO 텍스트
+            // NUVY PHOTO
             const footerY = p2y + PHOTO_H + 8;
             ctx.fillStyle = '#1a1a1a';
-            ctx.fillRect(filmX, footerY, FILM_W, FOOTER_H);
+            ctx.fillRect(FILM_X, footerY, FILM_W, FOOTER_H);
             ctx.fillStyle = 'rgba(255,255,255,0.62)';
             ctx.font = `${Math.round(FILM_W * 0.07)}px "Helvetica Neue", Arial, sans-serif`;
             ctx.textAlign = 'center';
-            ctx.letterSpacing = '0.35em';
             ctx.fillText('NUVY PHOTO', OUT_W / 2, footerY + FOOTER_H * 0.68);
 
-            fc.toBlob(blob => {
-              if (blob) resolve(blob);
-              else reject(new Error('blob 실패'));
-            }, 'image/jpeg', 0.93);
+            fc.toBlob(b => b ? resolve(b) : reject(new Error('blob 실패')), 'image/jpeg', 0.93);
           };
           p2.src = shot2DataURL;
         };
@@ -636,61 +658,49 @@
     });
   }
 
-  // 둥근 사각형
   function roundRect(ctx, x, y, w, h, r) {
     ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.lineTo(x + w - r, y);
-    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-    ctx.lineTo(x + w, y + h - r);
-    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-    ctx.lineTo(x + r, y + h);
-    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-    ctx.lineTo(x, y + r);
-    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
+    ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+    ctx.lineTo(x+w,y+h-r);
+    ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+    ctx.lineTo(x+r,y+h);
+    ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+    ctx.lineTo(x,y+r);
+    ctx.quadraticCurveTo(x,y,x+r,y);
     ctx.closePath();
   }
 
-  // 퍼포레이션 구멍 그리기
-  function drawPerfs(ctx, filmX, y, filmW, h) {
-    const count   = 6;
-    const holeW   = Math.round(filmW * 0.075);
-    const holeH   = Math.round(h * 0.72);
-    const spacing = filmW / count;
-    ctx.fillStyle = '#f5f5f5';
-    for (let i = 0; i < count; i++) {
-      const hx = filmX + spacing * i + (spacing - holeW) / 2;
-      const hy = y + (h - holeH) / 2;
-      ctx.beginPath();
-      ctx.roundRect(hx, hy, holeW, holeH, 2);
-      ctx.fill();
-    }
-  }
-
-  // QR 생성
-  async function goQR() {
+  // 결과 화면
+  async function goResult() {
     document.getElementById('main-screen').classList.remove('show');
-    document.getElementById('qr-screen').classList.add('show');
+    document.getElementById('result-screen').classList.add('show');
 
-    const statusEl    = document.getElementById('qr-status');
-    const qrContainer = document.getElementById('qr-container');
+    const statusEl = document.getElementById('result-status');
+    const qrEl     = document.getElementById('result-qr');
     statusEl.textContent = '현상 중입니다... 🎞️';
 
     try {
       finalBlob = await composeFinal();
+
+      // 미리보기 이미지
+      const blobURL = URL.createObjectURL(finalBlob);
+      document.getElementById('result-img').src = blobURL;
+
+      // Firebase 업로드
       const fb = window._fb;
       if (!fb) throw new Error('Firebase 미설정');
       const sRef = fb.ref(fb.storage, `camelion/${Date.now()}.jpg`);
       await fb.uploadBytes(sRef, finalBlob, { contentType: 'image/jpeg' });
       const url = await fb.getDownloadURL(sRef);
-      const qrURL = `https://nuvyseason.vercel.app/download.html?img=${encodeURIComponent(url)}`;
+      const qrURL = `https://cameleon-v1.vercel.app/download.html?img=${encodeURIComponent(url)}`;
 
       statusEl.textContent = 'QR을 스캔해서 저장하세요 ✿';
-      new QRCode(qrContainer, {
+      new QRCode(qrEl, {
         text: qrURL,
-        width: 220, height: 220,
-        colorDark: '#222',
-        colorLight: '#fff',
+        width: 200, height: 200,
+        colorDark: '#111',
+        colorLight: '#ffffff',
         correctLevel: QRCode.CorrectLevel.M
       });
     } catch(e) {
@@ -703,16 +713,16 @@
   function retake() {
     shotCount = 0;
     shot1DataURL = shot2DataURL = finalBlob = null;
-    document.getElementById('qr-screen').classList.remove('show');
-    document.getElementById('done-overlay').classList.remove('show');
+    document.getElementById('result-screen').classList.remove('show');
     document.getElementById('main-screen').classList.remove('show');
     document.getElementById('bg-select-screen').classList.remove('hidden');
     document.querySelectorAll('.bg-thumb').forEach(t => t.classList.remove('active'));
     document.getElementById('start-btn').disabled = true;
     document.getElementById('slot1').innerHTML = '<span class="slot-label">1st</span>';
     document.getElementById('slot2').innerHTML = '<span class="slot-label">2nd</span>';
-    document.getElementById('qr-container').innerHTML = '';
-    document.getElementById('qr-status').textContent = '업로드 중...';
+    document.getElementById('result-img').src = '';
+    document.getElementById('result-qr').innerHTML = '';
+    document.getElementById('result-status').textContent = '현상 중입니다... 🎞️';
     shotLabel.textContent = '1 / 2 — 눌러서 촬영';
     shutterBtn.disabled = false;
     selectedBg = null;
@@ -722,7 +732,6 @@
   window.selectBg  = selectBg;
   window.startMain = startMain;
   window.startShot = startShot;
-  window.goQR      = goQR;
   window.retake    = retake;
 </script>
 </body>
