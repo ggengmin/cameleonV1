@@ -183,7 +183,8 @@ window.addEventListener('load', function() {
     return;
   }
 
-  imageURL = imgParam;
+  // 이렇게 다시 decode 해줘야 해
+  imageURL = decodeURIComponent(imgParam);
   const img  = document.getElementById('photo-img');
   const slot = document.getElementById('photo-slot');
 
@@ -202,8 +203,13 @@ window.addEventListener('load', function() {
     }, 3400);
   };
 
-  img.onerror = function() {
-    document.getElementById('loading-text').textContent = '❌ 오류: ' + imageURL.substring(0, 50);
+img.onerror = function() {
+    const msg = '❌ 오류\n' + 
+      'URL: ' + imageURL + '\n' +
+      'imgParam: ' + imgParam;
+    document.getElementById('loading-text').textContent = msg;
+    document.getElementById('loading-text').style.cssText = 
+      'word-break:break-all; white-space:pre-wrap; font-size:9px; color:#f66; letter-spacing:0; animation:none; padding:10px;';
   };
 
   img.src = imageURL;
